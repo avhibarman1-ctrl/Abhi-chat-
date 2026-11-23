@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ABHI CHAT</string>
+    <string name="tagline">Connect, Share &amp; Chat in Real Time</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="nav_chats">Chats</string>
+    <string name="nav_updates">Updates</string>
+    <string name="nav_friends">Friends</string>
+    <string name="nav_alerts">Alerts</string>
+    <string name="nav_profile">Profile</string>
+    <string name="edited_label">Edited</string>
+    <string name="forwarded_label">Forwarded</string>
+    <string name="deleted_for_everyone_text">This message was deleted</string>
+</resources>

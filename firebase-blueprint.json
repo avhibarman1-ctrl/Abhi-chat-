@@ -1,0 +1,410 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Public discovery and presence profile for an ABHI CHAT user (PII isolated in private subcollection).",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "username": { "type": "string", "description": "Unique lowercase handle" },
+        "bio": { "type": "string", "description": "Profile bio" },
+        "avatarUrl": { "type": "string", "description": "Profile photo URL or data URI" },
+        "online": { "type": "boolean", "description": "Online presence flag" },
+        "profileVisibility": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "hasActiveStory": { "type": "boolean", "description": "Whether user has an active 24h story" },
+        "lastSeenAt": { "type": "string", "format": "date-time", "description": "Server timestamp" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp" }
+      },
+      "required": ["userId", "displayName", "username", "online", "profileVisibility", "hasActiveStory", "createdAt", "updatedAt"]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Owner-only PII document storing user email.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "email": { "type": "string" },
+        "fcmToken": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email", "updatedAt"]
+    },
+    "PrivacySettings": {
+      "title": "PrivacySettings",
+      "description": "Granular user privacy controls for profile, presence, statuses, stories, messages, and friend requests.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "profileVisibility": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "lastSeenPrivacy": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "onlineStatusPrivacy": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "profilePhotoPrivacy": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "bioPrivacy": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "statusPrivacy": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "storyPrivacy": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "whoCanMessageMe": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "NOBODY"] },
+        "whoCanSendFriendRequests": { "type": "string", "enum": ["EVERYONE", "FRIENDS_OF_FRIENDS", "NOBODY"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "profileVisibility", "lastSeenPrivacy", "onlineStatusPrivacy", "profilePhotoPrivacy", "bioPrivacy", "statusPrivacy", "storyPrivacy", "whoCanMessageMe", "whoCanSendFriendRequests", "createdAt", "updatedAt"]
+    },
+    "Chat": {
+      "title": "Chat",
+      "description": "1-on-1 private conversation metadata.",
+      "type": "object",
+      "properties": {
+        "participantIds": { "type": "array" },
+        "participantNames": { "type": "object" },
+        "lastMessage": { "type": "string" },
+        "lastMessageType": { "type": "string", "enum": ["TEXT", "IMAGE", "VIDEO", "LOCATION", "CALL_LOG"] },
+        "lastSenderId": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantIds", "lastMessage", "lastMessageType", "lastSenderId", "createdBy", "createdAt", "updatedAt"]
+    },
+    "Group": {
+      "title": "Group",
+      "description": "Group chat conversation with admins and members.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "photoData": { "type": "string" },
+        "createdBy": { "type": "string" },
+        "adminIds": { "type": "array" },
+        "memberIds": { "type": "array" },
+        "lastMessage": { "type": "string" },
+        "lastSenderName": { "type": "string" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "createdBy", "adminIds", "memberIds", "lastMessage", "lastSenderName", "createdAt", "updatedAt"]
+    },
+    "GroupMember": {
+      "title": "GroupMember",
+      "description": "Membership record for a user inside a group.",
+      "type": "object",
+      "properties": {
+        "groupId": { "type": "string" },
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "role": { "type": "string", "enum": ["ADMIN", "MEMBER"] },
+        "visibleToMemberIds": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["groupId", "userId", "displayName", "role", "visibleToMemberIds", "createdAt", "updatedAt"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Real-time chat or group message supporting edit, delete for me/everyone, reply, forward, media, and live location.",
+      "type": "object",
+      "properties": {
+        "chatId": { "type": "string" },
+        "conversationType": { "type": "string", "enum": ["DIRECT", "GROUP"] },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "recipientId": { "type": "string" },
+        "memberIds": { "type": "array" },
+        "text": { "type": "string" },
+        "messageType": { "type": "string", "enum": ["TEXT", "IMAGE", "VIDEO", "LOCATION", "CALL_LOG"] },
+        "mediaData": { "type": "string" },
+        "mediaDurationSec": { "type": "integer" },
+        "locationLat": { "type": "number" },
+        "locationLng": { "type": "number" },
+        "locationLive": { "type": "boolean" },
+        "locationExpiresAtMillis": { "type": "integer" },
+        "locationUpdatedAtMillis": { "type": "integer" },
+        "replyToMessageId": { "type": "string" },
+        "replyToSenderName": { "type": "string" },
+        "replyToText": { "type": "string" },
+        "forwarded": { "type": "boolean" },
+        "edited": { "type": "boolean" },
+        "editedAt": { "type": "string", "format": "date-time" },
+        "deletedForEveryone": { "type": "boolean" },
+        "deletedForUserIds": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["chatId", "conversationType", "senderId", "senderName", "memberIds", "text", "messageType", "forwarded", "edited", "deletedForEveryone", "deletedForUserIds", "createdAt", "updatedAt"]
+    },
+    "StatusItem": {
+      "title": "StatusItem",
+      "description": "WhatsApp-style 24-hour status update (photo, video, or text).",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userAvatarUrl": { "type": "string" },
+        "mediaType": { "type": "string", "enum": ["TEXT", "PHOTO", "VIDEO"] },
+        "text": { "type": "string" },
+        "backgroundColorHex": { "type": "string" },
+        "mediaData": { "type": "string" },
+        "privacy": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "ONLY_ME"] },
+        "allowedViewerIds": { "type": "array" },
+        "viewerCount": { "type": "integer" },
+        "expiresAtMillis": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userName", "mediaType", "text", "privacy", "allowedViewerIds", "viewerCount", "expiresAtMillis", "createdAt", "updatedAt"]
+    },
+    "StatusView": {
+      "title": "StatusView",
+      "description": "Seen/viewer receipt for a WhatsApp-style status.",
+      "type": "object",
+      "properties": {
+        "statusId": { "type": "string" },
+        "statusOwnerId": { "type": "string" },
+        "viewerId": { "type": "string" },
+        "viewerName": { "type": "string" },
+        "viewerAvatarUrl": { "type": "string" },
+        "viewedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["statusId", "statusOwnerId", "viewerId", "viewerName", "viewedAt"]
+    },
+    "StoryItem": {
+      "title": "StoryItem",
+      "description": "Facebook-style 24-hour story with captions, reactions, replies, and ring indicator.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userAvatarUrl": { "type": "string" },
+        "mediaType": { "type": "string", "enum": ["PHOTO", "VIDEO", "TEXT"] },
+        "caption": { "type": "string" },
+        "overlayText": { "type": "string" },
+        "backgroundColorHex": { "type": "string" },
+        "mediaData": { "type": "string" },
+        "privacy": { "type": "string", "enum": ["EVERYONE", "FRIENDS", "ONLY_ME"] },
+        "allowedViewerIds": { "type": "array" },
+        "reactionCounts": { "type": "object" },
+        "userReactions": { "type": "object" },
+        "viewerCount": { "type": "integer" },
+        "replyCount": { "type": "integer" },
+        "expiresAtMillis": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "userName", "mediaType", "caption", "privacy", "allowedViewerIds", "reactionCounts", "userReactions", "viewerCount", "replyCount", "expiresAtMillis", "createdAt", "updatedAt"]
+    },
+    "StoryView": {
+      "title": "StoryView",
+      "description": "Viewer record with optional reaction and reply for a Facebook-style story.",
+      "type": "object",
+      "properties": {
+        "storyId": { "type": "string" },
+        "storyOwnerId": { "type": "string" },
+        "viewerId": { "type": "string" },
+        "viewerName": { "type": "string" },
+        "viewerAvatarUrl": { "type": "string" },
+        "reaction": { "type": "string" },
+        "replyText": { "type": "string" },
+        "viewedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["storyId", "storyOwnerId", "viewerId", "viewerName", "viewedAt"]
+    },
+    "FriendRequest": {
+      "title": "FriendRequest",
+      "description": "Friend request workflow state between two users.",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderAvatarUrl": { "type": "string" },
+        "receiverId": { "type": "string" },
+        "receiverName": { "type": "string" },
+        "receiverAvatarUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED"] },
+        "participantIds": { "type": "array" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["senderId", "senderName", "receiverId", "receiverName", "status", "participantIds", "createdAt", "updatedAt"]
+    },
+    "Friend": {
+      "title": "Friend",
+      "description": "Confirmed bidirectional friendship edge.",
+      "type": "object",
+      "properties": {
+        "participantIds": { "type": "array" },
+        "userNames": { "type": "object" },
+        "userAvatars": { "type": "object" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participantIds", "userNames", "createdAt", "updatedAt"]
+    },
+    "BlockedUser": {
+      "title": "BlockedUser",
+      "description": "Block record preventing messages, calls, and friend requests.",
+      "type": "object",
+      "properties": {
+        "blockerId": { "type": "string" },
+        "blockedId": { "type": "string" },
+        "blockedName": { "type": "string" },
+        "blockedAvatarUrl": { "type": "string" },
+        "reason": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["blockerId", "blockedId", "blockedName", "createdAt"]
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Immutable abuse/safety report submitted by a user.",
+      "type": "object",
+      "properties": {
+        "reporterId": { "type": "string" },
+        "reportedUserId": { "type": "string" },
+        "reportedUserName": { "type": "string" },
+        "reason": { "type": "string" },
+        "details": { "type": "string" },
+        "status": { "type": "string", "enum": ["SUBMITTED"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["reporterId", "reportedUserId", "reportedUserName", "reason", "status", "createdAt"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "Real-time notification event for replies, groups, friend requests, and calls.",
+      "type": "object",
+      "properties": {
+        "recipientId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "type": { "type": "string", "enum": ["GROUP_MESSAGE", "MESSAGE_REPLY", "FRIEND_REQUEST", "FRIEND_ACCEPTED", "STORY_REPLY", "STATUS_REPLY", "INCOMING_CALL"] },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "targetId": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["recipientId", "senderId", "senderName", "type", "title", "body", "read", "createdAt"]
+    },
+    "CallSession": {
+      "title": "CallSession",
+      "description": "Voice or Video call signaling session.",
+      "type": "object",
+      "properties": {
+        "callerId": { "type": "string" },
+        "callerName": { "type": "string" },
+        "callerAvatarUrl": { "type": "string" },
+        "calleeId": { "type": "string" },
+        "calleeName": { "type": "string" },
+        "calleeAvatarUrl": { "type": "string" },
+        "participantIds": { "type": "array" },
+        "callType": { "type": "string", "enum": ["VOICE", "VIDEO"] },
+        "status": { "type": "string", "enum": ["RINGING", "ACTIVE", "ENDED", "REJECTED", "MISSED"] },
+        "offerSdp": { "type": "string" },
+        "offerType": { "type": "string" },
+        "answerSdp": { "type": "string" },
+        "answerType": { "type": "string" },
+        "iceState": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "endedAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["callerId", "callerName", "calleeId", "calleeName", "participantIds", "callType", "status", "createdAt", "updatedAt"]
+    },
+    "IceCandidateRecord": {
+      "title": "IceCandidateRecord",
+      "description": "WebRTC ICE candidate exchanged between caller and callee.",
+      "type": "object",
+      "properties": {
+        "callId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "sdpMid": { "type": "string" },
+        "sdpMLineIndex": { "type": "integer" },
+        "candidate": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["callId", "senderId", "sdpMid", "sdpMLineIndex", "candidate", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User public profile and presence"
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/UserPrivateInfo" },
+      "description": "Owner-only private user PII"
+    },
+    "/privacy_settings/{userId}": {
+      "schema": { "$ref": "#/entities/PrivacySettings" },
+      "description": "Per-user granular privacy configuration"
+    },
+    "/chats/{chatId}": {
+      "schema": { "$ref": "#/entities/Chat" },
+      "description": "1-on-1 private chat rooms"
+    },
+    "/groups/{groupId}": {
+      "schema": { "$ref": "#/entities/Group" },
+      "description": "Group chat rooms and admin metadata"
+    },
+    "/group_members/{memberDocId}": {
+      "schema": { "$ref": "#/entities/GroupMember" },
+      "description": "Group member roles and profiles"
+    },
+    "/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Direct and group chat messages"
+    },
+    "/statuses/{statusId}": {
+      "schema": { "$ref": "#/entities/StatusItem" },
+      "description": "WhatsApp-style 24h status updates"
+    },
+    "/status_views/{viewId}": {
+      "schema": { "$ref": "#/entities/StatusView" },
+      "description": "Status viewer receipts"
+    },
+    "/stories/{storyId}": {
+      "schema": { "$ref": "#/entities/StoryItem" },
+      "description": "Facebook-style 24h stories"
+    },
+    "/story_views/{viewId}": {
+      "schema": { "$ref": "#/entities/StoryView" },
+      "description": "Story viewer, reaction, and reply receipts"
+    },
+    "/friend_requests/{requestId}": {
+      "schema": { "$ref": "#/entities/FriendRequest" },
+      "description": "Friend request lifecycle documents"
+    },
+    "/friends/{friendDocId}": {
+      "schema": { "$ref": "#/entities/Friend" },
+      "description": "Confirmed friend relationships"
+    },
+    "/blocked_users/{blockId}": {
+      "schema": { "$ref": "#/entities/BlockedUser" },
+      "description": "Blocked user records"
+    },
+    "/reports/{reportId}": {
+      "schema": { "$ref": "#/entities/Report" },
+      "description": "User safety and abuse reports"
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/AppNotification" },
+      "description": "User notifications inbox"
+    },
+    "/calls/{callId}": {
+      "schema": { "$ref": "#/entities/CallSession" },
+      "description": "Voice and video call signaling"
+    },
+    "/calls/{callId}/caller_candidates/{candidateId}": {
+      "schema": { "$ref": "#/entities/IceCandidateRecord" },
+      "description": "Caller WebRTC ICE candidates"
+    },
+    "/calls/{callId}/callee_candidates/{candidateId}": {
+      "schema": { "$ref": "#/entities/IceCandidateRecord" },
+      "description": "Callee WebRTC ICE candidates"
+    }
+  }
+}

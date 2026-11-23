@@ -1,0 +1,6 @@
+{
+  "name": "ABHI CHAT",
+  "description": "Social messaging application with real-time chats, group messaging, statuses, stories, calls, live location sharing, friend requests, and privacy settings.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
